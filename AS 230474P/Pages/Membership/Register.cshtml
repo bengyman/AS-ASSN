@@ -1,0 +1,80 @@
+﻿@page
+@model AS_230474P.Pages.Membership.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <div>
+        <label asp-for="Registration.FirstName"></label>
+        <input asp-for="Registration.FirstName" class="form-control" />
+        <span asp-validation-for="Registration.FirstName" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.LastName"></label>
+        <input asp-for="Registration.LastName" class="form-control" />
+        <span asp-validation-for="Registration.LastName" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.Gender"></label>
+        <select asp-for="Registration.Gender" class="form-control">
+            <option value="">-- Select Gender --</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+        <span asp-validation-for="Registration.Gender" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.NRIC"></label>
+        <input asp-for="Registration.NRIC" class="form-control" />
+        <span asp-validation-for="Registration.NRIC" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.Email"></label>
+        <input asp-for="Registration.Email" class="form-control" />
+        <span asp-validation-for="Registration.Email" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.Password"></label>
+        <input asp-for="Registration.Password" type="password" class="form-control" />
+        <span asp-validation-for="Registration.Password" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.ConfirmPassword"></label>
+        <input asp-for="Registration.ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="Registration.ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.DateOfBirth"></label>
+        <input asp-for="Registration.DateOfBirth" type="date" class="form-control" />
+        <span asp-validation-for="Registration.DateOfBirth" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.Resume"></label>
+        <input asp-for="Registration.Resume" type="file" class="form-control" />
+        <span asp-validation-for="Registration.Resume" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label asp-for="Registration.WhoAmI"></label>
+        <textarea asp-for="Registration.WhoAmI" class="form-control"></textarea>
+        <span asp-validation-for="Registration.WhoAmI" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,53 @@
+/* wwwroot/css/site.css */
+
+/* Body and Text */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1, h2, h3 {
+    color: #007bff;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #007bff;
+}
+
+    .navbar .navbar-brand {
+        color: white !important;
+    }
+
+    .navbar .nav-link {
+        color: white !important;
+    }
+
+        .navbar .nav-link:hover {
+            background-color: #0056b3;
+        }
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+input[type="text"], input[type="password"], input[type="email"], input[type="date"] {
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    button[type="submit"]:hover {
+        background-color: #218838;
+    }
