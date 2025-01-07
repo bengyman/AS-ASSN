@@ -1,23 +1,27 @@
 using AS_230474P.Data;
 using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load environment variables
+DotNetEnv.Env.Load();
+
+// Retrieve the encryption key from environment variables
+var encryptionKey = Environment.GetEnvironmentVariable("ENCRYPTION_KEY");
+if (string.IsNullOrEmpty(encryptionKey))
+{
+    throw new InvalidOperationException("Encryption key is not configured. Set the ENCRYPTION_KEY environment variable.");
+}
+
+// Add the encryption key to the dependency injection container
+builder.Services.AddSingleton(encryptionKey);
 
 // Configure services
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddRazorPages();
-
-// Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigins", policy =>
-    {
-        policy.WithOrigins("https://example.com") // Replace with your client URL
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
 
 var app = builder.Build();
 
@@ -30,12 +34,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-// Enable CORS
-app.UseCors("AllowSpecificOrigins");
-
 app.UseRouting();
 app.UseAuthorization();
-
 app.MapRazorPages();
 app.Run();

@@ -10,6 +10,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using DotNetEnv;
+
 
 namespace AS_230474P.Pages.Membership
 {
@@ -17,11 +21,13 @@ namespace AS_230474P.Pages.Membership
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<RegisterModel> _logger; // Inject ILogger
+        private readonly string _encryptionKey;
 
-        public RegisterModel(ApplicationDbContext context, ILogger<RegisterModel> logger)
+        public RegisterModel(ApplicationDbContext context, ILogger<RegisterModel> logger, string encryptionKey)
         {
             _context = context;
             _logger = logger;
+            _encryptionKey = encryptionKey;
         }
 
         [BindProperty]
@@ -57,9 +63,7 @@ namespace AS_230474P.Pages.Membership
                 return Page();
             }
 
-            // Encrypt NRIC (replace with a proper encryption method in production)
-            string encryptedNRIC = EncryptNRIC(Registration.NRIC);
-
+            
             // Save the Resume file only if provided (make it optional)
             string resumePath = null;
             if (Registration.Resume != null && Registration.Resume.Length > 0)
@@ -73,9 +77,9 @@ namespace AS_230474P.Pages.Membership
                 FirstName = Registration.FirstName,
                 LastName = Registration.LastName,
                 Gender = Registration.Gender,
-                NRIC = encryptedNRIC,
+                NRIC = EncryptData(Registration.NRIC, _encryptionKey),
                 Email = Registration.Email,
-                Password = Registration.Password, // Password should be hashed in production
+                Password = HashPassword(Registration.Password), // Password is now hashed
                 DateOfBirth = Registration.DateOfBirth,
                 ResumeFilePath = resumePath, // Store file path only if resume provided
                 WhoAmI = Registration.WhoAmI,
@@ -100,14 +104,10 @@ namespace AS_230474P.Pages.Membership
             }
 
             // Redirect to a success page
-            return RedirectToPage("Success");
+            return RedirectToPage("Homepage", new { userId = newRegistration.Id });
         }
 
-        private string EncryptNRIC(string nric)
-        {
-            // Example encryption logic (replace with a secure implementation)
-            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(nric));
-        }
+        
 
         private async Task<string> SaveResumeFileAsync(IFormFile resumeFile)
         {
@@ -150,6 +150,63 @@ namespace AS_230474P.Pages.Membership
 
             return null; // Password is strong
         }
+
+        private string HashPassword(string password)
+        {
+            byte[] salt = new byte[16];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 10000,
+                numBytesRequested: 32));
+
+            return $"{Convert.ToBase64String(salt)}.{hashed}";
+        }
+
+        private bool VerifyPassword(string password, string storedHash)
+        {
+            var parts = storedHash.Split('.');
+            if (parts.Length != 2)
+                return false;
+
+            byte[] salt = Convert.FromBase64String(parts[0]);
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 10000,
+                numBytesRequested: 32));
+
+            return hashed == parts[1];
+        }
+
+        private string EncryptData(string plainText, string encryptionKey)
+        {
+            using var aes = Aes.Create();
+            aes.Key = Convert.FromBase64String(encryptionKey);
+            aes.GenerateIV();
+            using var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+            using var ms = new MemoryStream();
+            using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+            using (var writer = new StreamWriter(cs))
+            {
+                writer.Write(plainText);
+            }
+
+            var iv = Convert.ToBase64String(aes.IV);
+            var encrypted = Convert.ToBase64String(ms.ToArray());
+            return $"{iv}.{encrypted}";
+        }
+
+
+
 
         private void LogValidationErrors()
         {

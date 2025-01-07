@@ -249,8 +249,28 @@
       "PackagePath": "staticwebassets\\uploads\\47cbd6cd-7443-4781-99f6-15c701606bdf.docx"
     },
     {
+      "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\5c5c0e88-1ae5-4b53-ac72-863f0082e131.docx",
+      "PackagePath": "staticwebassets\\uploads\\5c5c0e88-1ae5-4b53-ac72-863f0082e131.docx"
+    },
+    {
+      "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\68a6b305-fcd1-4c1e-86df-359e4a98828f.docx",
+      "PackagePath": "staticwebassets\\uploads\\68a6b305-fcd1-4c1e-86df-359e4a98828f.docx"
+    },
+    {
+      "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\8e9d210c-1a2b-42e9-a2aa-98df90c5a902.docx",
+      "PackagePath": "staticwebassets\\uploads\\8e9d210c-1a2b-42e9-a2aa-98df90c5a902.docx"
+    },
+    {
+      "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\bc6012b6-c846-451e-b44e-43d32cb89923.docx",
+      "PackagePath": "staticwebassets\\uploads\\bc6012b6-c846-451e-b44e-43d32cb89923.docx"
+    },
+    {
       "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\cfd69395-4f9f-42b5-84c9-d6e8a6a60f20.pptx",
       "PackagePath": "staticwebassets\\uploads\\cfd69395-4f9f-42b5-84c9-d6e8a6a60f20.pptx"
+    },
+    {
+      "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\dc0fd8c2-8a31-466a-b15d-fea6c4ab7288.pptx",
+      "PackagePath": "staticwebassets\\uploads\\dc0fd8c2-8a31-466a-b15d-fea6c4ab7288.pptx"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.AS 230474P.Microsoft.AspNetCore.StaticWebAssets.props",
