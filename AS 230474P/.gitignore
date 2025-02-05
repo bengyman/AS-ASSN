@@ -1,2 +1,59 @@
-.vs/
+# Build Results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Logs
+*.log
+logs/
+
+# Environment Variables
 .env
+
+# Database files
+*.mdf
+*.ldf
+*.db
+*.sqlite
+
+# Publish Output
+wwwroot/dist/
+wwwroot/node_modules/
+node_modules/
+
+# Dependency directories
+packages/
+bower_components/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swn
+
+# MacOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Docker
+docker-compose.override.yml

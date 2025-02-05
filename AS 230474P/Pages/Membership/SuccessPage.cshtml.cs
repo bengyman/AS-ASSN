@@ -14,7 +14,7 @@ namespace AS_230474P.Pages.Membership
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<SuccessPageModel> _logger;
-        private readonly string _encryptionKey = "your-encryption-key"; // Replace with your actual encryption key
+        private readonly string _encryptionKey;
 
         // Property to hold the user's registration data
         public RegistrationModel Registration { get; set; }
@@ -23,6 +23,10 @@ namespace AS_230474P.Pages.Membership
         {
             _context = context;
             _logger = logger;
+            DotNetEnv.Env.Load(); // Make sure this is called somewhere
+            _encryptionKey = Environment.GetEnvironmentVariable("ENCRYPTION_KEY");
+
+
         }
 
         // OnGet method to retrieve the registration details
@@ -63,7 +67,7 @@ namespace AS_230474P.Pages.Membership
             var cipherBytes = Convert.FromBase64String(parts[1]);
 
             using var aes = Aes.Create();
-            aes.Key = Convert.FromBase64String(encryptionKey.Replace('-', '+').Replace('_', '/'));
+            aes.Key = Convert.FromBase64String(encryptionKey);
             aes.IV = iv;
 
             using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
