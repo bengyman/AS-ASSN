@@ -19,14 +19,15 @@ namespace AS_230474P.Pages.Membership
         // Property to hold the user's registration data
         public RegistrationModel Registration { get; set; }
 
+        // Property to hold error message
+        public string ErrorMessage { get; set; }
+
         public SuccessPageModel(ApplicationDbContext context, ILogger<SuccessPageModel> logger)
         {
             _context = context;
             _logger = logger;
             DotNetEnv.Env.Load(); // Make sure this is called somewhere
             _encryptionKey = Environment.GetEnvironmentVariable("ENCRYPTION_KEY");
-
-
         }
 
         // OnGet method to retrieve the registration details
@@ -39,14 +40,16 @@ namespace AS_230474P.Pages.Membership
             if (string.IsNullOrEmpty(sessionUserId) || string.IsNullOrEmpty(sessionToken))
             {
                 _logger.LogWarning("Session expired or invalid. Redirecting to login.");
-                return RedirectToPage("/Homepage"); // Redirect to login if session expired
+                ErrorMessage = "Your session has expired. Please log in again.";
+                return Page(); // Stay on the current page and display the error
             }
 
             // Ensure the user is accessing their own data
             if (int.Parse(sessionUserId) != userId)
             {
                 _logger.LogWarning($"Unauthorized access attempt by User ID {sessionUserId} to User ID {userId}.");
-                return Unauthorized();
+                ErrorMessage = "Unauthorized access.";
+                return Page(); // Stay on the current page and display the error
             }
 
             // Retrieve the user's registration data from the database
@@ -55,7 +58,8 @@ namespace AS_230474P.Pages.Membership
             if (Registration == null)
             {
                 _logger.LogError($"User with ID {userId} not found.");
-                return NotFound();
+                ErrorMessage = "User not found.";
+                return Page(); // Stay on the current page and display the error
             }
 
             // Verify session token to prevent multiple logins from different devices
@@ -63,7 +67,8 @@ namespace AS_230474P.Pages.Membership
             {
                 _logger.LogWarning($"Session token mismatch for User ID {userId}. Possible multiple login detected.");
                 HttpContext.Session.Clear(); // Clear invalid session
-                return RedirectToPage("/Homepage"); // Redirect to login
+                ErrorMessage = "You have been logged out due to logging in from another device.";
+                return Page(); // Stay on the current page and display the error
             }
 
             try
@@ -75,7 +80,8 @@ namespace AS_230474P.Pages.Membership
             catch (Exception ex)
             {
                 _logger.LogError($"Error decrypting data for user with ID {userId}: {ex.Message}");
-                return StatusCode(500, "Error decrypting data");
+                ErrorMessage = "Error decrypting data. Please try again later.";
+                return Page(); // Stay on the current page and display the error
             }
 
             return Page();

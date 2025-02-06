@@ -11,21 +11,36 @@
 <body>
     <h1>Registration Successful!</h1>
 
-    <h2>User Details</h2>
-    <p><strong>First Name:</strong> @Model.Registration.FirstName</p>
-    <p><strong>Last Name:</strong> @Model.Registration.LastName</p>
-    <p><strong>Email:</strong> @Model.Registration.Email</p>
-    <p><strong>Gender:</strong> @Model.Registration.Gender</p>
-    <p><strong>Date of Birth:</strong> @Model.Registration.DateOfBirth.ToString("MM/dd/yyyy")</p>
-    <p><strong>Who Am I:</strong> @Model.Registration.WhoAmI</p>
-
-    @if (!string.IsNullOrEmpty(Model.Registration.ResumeFilePath))
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <p><strong>Resume:</strong> <a href="@Model.Registration.ResumeFilePath" target="_blank">Download Resume</a></p>
+        <div class="alert alert-danger">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    <h2>User Details</h2>
+
+    @if (Model.Registration != null)
+    {
+        <p><strong>First Name:</strong> @Model.Registration.FirstName</p>
+        <p><strong>Last Name:</strong> @Model.Registration.LastName</p>
+        <p><strong>Email:</strong> @Model.Registration.Email</p>
+        <p><strong>Gender:</strong> @Model.Registration.Gender</p>
+        <p><strong>Date of Birth:</strong> @Model.Registration.DateOfBirth.ToString("MM/dd/yyyy")</p>
+        <p><strong>Who Am I:</strong> @Model.Registration.WhoAmI</p>
+
+        @if (!string.IsNullOrEmpty(Model.Registration.ResumeFilePath))
+        {
+            <p><strong>Resume:</strong> <a href="@Model.Registration.ResumeFilePath" target="_blank">Download Resume</a></p>
+        }
+        else
+        {
+            <p><strong>Resume:</strong> No resume uploaded.</p>
+        }
     }
     else
     {
-        <p><strong>Resume:</strong> No resume uploaded.</p>
+        <p>No registration details available.</p>
     }
 </body>
 </html>
