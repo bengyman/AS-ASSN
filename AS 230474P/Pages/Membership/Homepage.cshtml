@@ -14,14 +14,14 @@
 <body>
     <h1>Welcome! Please Log In</h1>
 
-    <form method="post">
+    <form method="post" asp-page-handler="Login">
         <div>
             <label for="email">Email:</label>
-            <input type="email" id="email" name="Login.Email" value="@Model.Login.Email" required>
+            <input type="email" id="email" asp-for="Login.Email" required>
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="Login.Password" required>
+            <input type="password" id="password" asp-for="Login.Password" required>
         </div>
         <div>
             <button type="submit">Log In</button>

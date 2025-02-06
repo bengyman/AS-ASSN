@@ -5,6 +5,14 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddRazorPages();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+    options.Cookie.HttpOnly = true; // Make cookie HTTP-only for security
+    options.Cookie.IsEssential = true;
+});
+
 // Load environment variables
 DotNetEnv.Env.Load();
 
@@ -25,6 +33,8 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+
+
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
@@ -33,6 +43,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSession();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();

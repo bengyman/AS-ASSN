@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using DotNetEnv;
+using Microsoft.AspNetCore.Http;
+using System.Security.Cryptography; // Make sure to include this namespace for session handling.
 
 namespace AS_230474P.Pages
 {
@@ -20,7 +22,6 @@ namespace AS_230474P.Pages
             _context = context;
             _logger = logger;
             _encryptionKey = encryptionKey;
-
         }
 
         [BindProperty]
@@ -52,6 +53,17 @@ namespace AS_230474P.Pages
 
             _logger.LogInformation("User {Email} logged in successfully.", Login.Email);
 
+            // Generate a unique session token
+            string sessionToken = GenerateSessionToken();
+
+            // Store session token in database
+            user.SessionToken = sessionToken;
+            _context.SaveChanges();
+
+            // Store session details in HTTP session
+            HttpContext.Session.SetString("UserId", user.Id.ToString());
+            HttpContext.Session.SetString("SessionToken", sessionToken);
+
             // Redirect to the success page
             return RedirectToPage("/Membership/SuccessPage", new { userId = user.Id });
         }
@@ -70,6 +82,12 @@ namespace AS_230474P.Pages
                 numBytesRequested: 32));
 
             return hashed == parts[1];
+        }
+
+        private string GenerateSessionToken()
+        {
+            // Generate a unique session token using a secure random number generator
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
         }
     }
 

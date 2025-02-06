@@ -62,5 +62,8 @@ namespace AS_230474P.Models
 
         [Display(Name = "Created at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Default value
+
+        [Display(Name = "Session Token")]
+        public string? SessionToken { get; set; }
     }
 }

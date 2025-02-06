@@ -32,14 +32,38 @@ namespace AS_230474P.Pages.Membership
         // OnGet method to retrieve the registration details
         public IActionResult OnGet(int userId)
         {
+            // Check if session exists
+            string sessionUserId = HttpContext.Session.GetString("UserId");
+            string sessionToken = HttpContext.Session.GetString("SessionToken");
+
+            if (string.IsNullOrEmpty(sessionUserId) || string.IsNullOrEmpty(sessionToken))
+            {
+                _logger.LogWarning("Session expired or invalid. Redirecting to login.");
+                return RedirectToPage("/Homepage"); // Redirect to login if session expired
+            }
+
+            // Ensure the user is accessing their own data
+            if (int.Parse(sessionUserId) != userId)
+            {
+                _logger.LogWarning($"Unauthorized access attempt by User ID {sessionUserId} to User ID {userId}.");
+                return Unauthorized();
+            }
+
             // Retrieve the user's registration data from the database
             Registration = _context.Registrations.FirstOrDefault(r => r.Id == userId);
 
             if (Registration == null)
             {
-                // If the user is not found, return a NotFound result
                 _logger.LogError($"User with ID {userId} not found.");
                 return NotFound();
+            }
+
+            // Verify session token to prevent multiple logins from different devices
+            if (Registration.SessionToken != sessionToken)
+            {
+                _logger.LogWarning($"Session token mismatch for User ID {userId}. Possible multiple login detected.");
+                HttpContext.Session.Clear(); // Clear invalid session
+                return RedirectToPage("/Homepage"); // Redirect to login
             }
 
             try
@@ -56,6 +80,7 @@ namespace AS_230474P.Pages.Membership
 
             return Page();
         }
+
 
         private string DecryptData(string cipherText, string encryptionKey)
         {
