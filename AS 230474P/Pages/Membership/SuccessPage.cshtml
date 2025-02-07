@@ -7,6 +7,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Success</title>
+    <style>
+        .logout-button {
+            background-color: red;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-button:hover {
+            background-color: darkred;
+        }
+    </style>
 </head>
 <body>
     <h1>Registration Successful!</h1>
@@ -42,5 +56,9 @@
     {
         <p>No registration details available.</p>
     }
+
+    <form method="post">
+        <button type="submit" asp-page-handler="Logout" class="logout-button">Logout</button>
+    </form>
 </body>
 </html>

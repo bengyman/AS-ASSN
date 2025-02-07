@@ -65,5 +65,11 @@ namespace AS_230474P.Models
 
         [Display(Name = "Session Token")]
         public string? SessionToken { get; set; }
+
+        [Display(Name = "Failed Login Attempts")]
+        public int FailedLoginAttempts { get; set; } = 0; // Track failed attempts
+
+        [Display(Name = "Lockout End Time")]
+        public DateTime? LockoutEnd { get; set; } // Store lockout time
     }
 }

@@ -87,6 +87,40 @@ namespace AS_230474P.Pages.Membership
             return Page();
         }
 
+        public IActionResult OnPostLogout()
+        {
+            try
+            {
+                // Get user ID from session
+                string sessionUserId = HttpContext.Session.GetString("UserId");
+
+                if (!string.IsNullOrEmpty(sessionUserId))
+                {
+                    int userId = int.Parse(sessionUserId);
+
+                    // Find the user and clear session token in database (optional)
+                    var user = _context.Registrations.FirstOrDefault(r => r.Id == userId);
+                    if (user != null)
+                    {
+                        user.SessionToken = null; // Remove session token
+                        _context.SaveChanges();
+                    }
+                }
+
+                // Clear session completely
+                HttpContext.Session.Clear();
+
+                // Redirect to the login page
+                return RedirectToPage("/Membership/Homepage");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error during logout: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "An error occurred while logging out. Please try again.");
+                return Page(); // Stay on the same page if an error occurs
+            }
+        }
+
 
         private string DecryptData(string cipherText, string encryptionKey)
         {

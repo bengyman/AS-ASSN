@@ -16,6 +16,8 @@ namespace AS_230474P.Pages
         private readonly ApplicationDbContext _context;
         private readonly ILogger<HomepageModel> _logger;
         private readonly string _encryptionKey;
+        private const int MaxFailedAttempts = 3; // Lock account after 3 failures
+        private const int LockoutDurationMinutes = 5; // Lock duration before allowing retry
 
         public HomepageModel(ApplicationDbContext context, ILogger<HomepageModel> logger, string encryptionKey)
         {
@@ -42,14 +44,46 @@ namespace AS_230474P.Pages
                 return Page();
             }
 
-            // Verify email and password against the database
             var user = _context.Registrations.FirstOrDefault(u => u.Email == Login.Email);
-            if (user == null || !VerifyPassword(Login.Password, user.Password))
+
+            if (user == null)
             {
                 ErrorMessage = "Invalid email or password.";
                 _logger.LogWarning("Failed login attempt for email: {Email}", Login.Email);
                 return Page();
             }
+
+            // Check if the account is locked
+            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            {
+                ErrorMessage = $"Your account is locked. Try again at {user.LockoutEnd.Value.ToLocalTime():HH:mm:ss}.";
+                return Page();
+            }
+
+            // Verify password
+            if (!VerifyPassword(Login.Password, user.Password))
+            {
+                user.FailedLoginAttempts += 1;
+
+                if (user.FailedLoginAttempts >= MaxFailedAttempts)
+                {
+                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(LockoutDurationMinutes);
+                    _logger.LogWarning("User {Email} is locked out until {Time}", Login.Email, user.LockoutEnd);
+                    ErrorMessage = $"Too many failed attempts. Your account is locked for {LockoutDurationMinutes} minutes.";
+                }
+                else
+                {
+                    ErrorMessage = "Invalid email or password.";
+                }
+
+                _context.SaveChanges();
+                return Page();
+            }
+
+            // Reset failed attempts after successful login
+            user.FailedLoginAttempts = 0;
+            user.LockoutEnd = null;
+            _context.SaveChanges();
 
             _logger.LogInformation("User {Email} logged in successfully.", Login.Email);
 
@@ -68,7 +102,10 @@ namespace AS_230474P.Pages
             return RedirectToPage("/Membership/SuccessPage", new { userId = user.Id });
         }
 
-        private bool VerifyPassword(string inputPassword, string storedHash)
+
+       
+
+    private bool VerifyPassword(string inputPassword, string storedHash)
         {
             var parts = storedHash.Split('.');
             if (parts.Length != 2) return false;
