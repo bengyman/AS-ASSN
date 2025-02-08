@@ -6,7 +6,7 @@
 
 <h1>Register</h1>
 
-<form method="post" enctype="multipart/form-data">
+<form id="register-form" method="post" enctype="multipart/form-data">
     <div>
         <label asp-for="Registration.FirstName"></label>
         <input asp-for="Registration.FirstName" class="form-control" />
@@ -72,9 +72,29 @@
         <span asp-validation-for="Registration.WhoAmI" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
+    <input type="hidden" id="recaptchaResponse" name="recaptchaResponse" />
+
+    <button type="submit" id="register-btn" class="btn btn-primary">Register</button>
 </form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lf6otAqAAAAAHE2RmvT2TthTBtlmOFeot0aBgJk"></script>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form submission until reCAPTCHA executes
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute('6Lf6otAqAAAAAHE2RmvT2TthTBtlmOFeot0aBgJk', { action: 'submit' }).then(function (token) {
+                    // Set the reCAPTCHA response token value in the hidden input field
+                    document.getElementById('recaptchaResponse').value = token;
+
+                    // Submit the form after setting the token
+                    document.getElementById('register-form').submit();
+                });
+            });
+        });
+    </script>
 }

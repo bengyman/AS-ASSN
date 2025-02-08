@@ -43,6 +43,9 @@
         <p><strong>Date of Birth:</strong> @Model.Registration.DateOfBirth.ToString("MM/dd/yyyy")</p>
         <p><strong>Who Am I:</strong> @Model.Registration.WhoAmI</p>
 
+        <p><strong>NRIC:</strong> @Model.Registration.NRIC</p>
+        
+
         @if (!string.IsNullOrEmpty(Model.Registration.ResumeFilePath))
         {
             <p><strong>Resume:</strong> <a href="@Model.Registration.ResumeFilePath" target="_blank">Download Resume</a></p>
@@ -52,6 +55,7 @@
             <p><strong>Resume:</strong> No resume uploaded.</p>
         }
     }
+
     else
     {
         <p>No registration details available.</p>

@@ -16,12 +16,27 @@ builder.Services.AddSession(options =>
 // Load environment variables
 DotNetEnv.Env.Load();
 
+var recaptchaSiteKey = Environment.GetEnvironmentVariable("RECAPTCHA_SITE_KEY");
+
+if (string.IsNullOrEmpty(recaptchaSiteKey))
+{
+    throw new InvalidOperationException("reCAPTCHA site key is not configured. Set the RECAPTCHA_SITE_KEY environment variable.");
+}
+
+// Register the reCAPTCHA site key in DI container
+builder.Services.AddSingleton(recaptchaSiteKey);
+
+
 // Retrieve the encryption key from environment variables
 var encryptionKey = Environment.GetEnvironmentVariable("ENCRYPTION_KEY");
 if (string.IsNullOrEmpty(encryptionKey))
 {
     throw new InvalidOperationException("Encryption key is not configured. Set the ENCRYPTION_KEY environment variable.");
 }
+
+
+
+builder.Services.AddHttpClient<ReCaptchaService>();
 
 // Add the encryption key to the dependency injection container
 builder.Services.AddSingleton(encryptionKey);
