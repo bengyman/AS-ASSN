@@ -12,6 +12,7 @@ namespace AS_230474P.Data
 
         // Explicitly define the table name and schema
         public DbSet<RegistrationModel> Registrations { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

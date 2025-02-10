@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System;
+using AS_230474P.Services;
 
 namespace AS_230474P.Pages
 {
@@ -20,11 +21,13 @@ namespace AS_230474P.Pages
         private readonly ILogger<HomepageModel> _logger;
         private const int MaxFailedAttempts = 3;
         private const int LockoutDurationMinutes = 5;
+        private readonly AuditLogService _auditLogService;
 
-        public HomepageModel(ApplicationDbContext context, ILogger<HomepageModel> logger)
+        public HomepageModel(ApplicationDbContext context, ILogger<HomepageModel> logger, AuditLogService auditLogService)
         {
             _context = context;
             _logger = logger;
+            _auditLogService = auditLogService;
         }
 
         [BindProperty]
@@ -101,6 +104,7 @@ namespace AS_230474P.Pages
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("SessionToken", sessionToken);
 
+            await _auditLogService.LogActionAsync("User Logged In", "Login");
             return RedirectToPage("/Membership/SuccessPage", new { userId = user.Id });
         }
 

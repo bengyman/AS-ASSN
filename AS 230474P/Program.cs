@@ -2,10 +2,13 @@ using AS_230474P.Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using System;
+using AS_230474P.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<AuditLogService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
@@ -36,6 +39,7 @@ if (string.IsNullOrEmpty(encryptionKey))
 
 
 
+
 builder.Services.AddHttpClient<ReCaptchaService>();
 
 // Add the encryption key to the dependency injection container
@@ -50,12 +54,12 @@ var app = builder.Build();
 
 
 
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+
+//  Move this OUTSIDE the if-condition so it applies in Development mode too
+app.UseStatusCodePagesWithReExecute("/Error", "?code={0}");
+app.UseExceptionHandler("/Error");
+app.UseHsts();
+
 
 app.UseHttpsRedirection();
 app.UseSession();
