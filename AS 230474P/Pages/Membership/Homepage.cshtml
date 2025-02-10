@@ -10,19 +10,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lf6otAqAAAAAHE2RmvT2TthTBtlmOFeot0aBgJk"></script>
 </head>
 <body>
     <h1>Welcome! Please Log In</h1>
 
-    <form method="post" asp-page-handler="Login">
+    <form id="login-form" method="post" asp-page-handler="Login">
+        @Html.AntiForgeryToken() <!-- CSRF Protection -->
         <div>
             <label for="email">Email:</label>
             <input type="email" id="email" asp-for="Login.Email" required>
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" asp-for="Login.Password" required>
+            <input type="password" id="password" asp-for="Login.Password" required minlength="8">
         </div>
+        <input type="hidden" id="recaptcha-token" name="recaptchaToken" />
         <div>
             <button type="submit">Log In</button>
         </div>
@@ -32,5 +35,18 @@
     {
         <p style="color:red">@Model.ErrorMessage</p>
     }
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute("6Lf6otAqAAAAAHE2RmvT2TthTBtlmOFeot0aBgJk", { action: "login" }).then(function (token) {
+                    document.getElementById("recaptcha-token").value = token;
+                    document.getElementById("login-form").submit(); // Submit after token is set
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 ﻿using AS_230474P.Models;
-using AS_230474P.Data;
+using AS_230474P.Data; // Import the DbContext
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging; // Import ILogger
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -13,46 +13,29 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using DotNetEnv;
-using System.Text.Json;
-using System.Net.Http;
+
 
 namespace AS_230474P.Pages.Membership
 {
     public class RegisterModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<RegisterModel> _logger;
+        private readonly ILogger<RegisterModel> _logger; // Inject ILogger
         private readonly string _encryptionKey;
-        private readonly IConfiguration _configuration;
-        private readonly string _recaptchaSiteKey;
 
-        public RegisterModel(ApplicationDbContext context, ILogger<RegisterModel> logger, string encryptionKey, IConfiguration configuration)
+        public RegisterModel(ApplicationDbContext context, ILogger<RegisterModel> logger, string encryptionKey)
         {
             _context = context;
             _logger = logger;
             _encryptionKey = encryptionKey;
-            _configuration = configuration;
-            _recaptchaSiteKey = configuration["RECAPTCHA_SITE_KEY"];
         }
 
         [BindProperty]
         public RegistrationModel Registration { get; set; }
 
-        [BindProperty]
-        public string RecaptchaResponse { get; set; }
-
-        public class RecaptchaVerificationResponse
-        {
-            public bool Success { get; set; }
-            public string ChallengeTs { get; set; }
-            public string Hostname { get; set; }
-            public float Score { get; set; } // For reCAPTCHA v3 score
-        }
-
         public void OnGet()
         {
             // Renders the registration form
-            ViewData["RecaptchaSiteKey"] = _recaptchaSiteKey;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -61,24 +44,6 @@ namespace AS_230474P.Pages.Membership
             {
                 LogValidationErrors();
                 return Page();
-            }
-
-            // reCAPTCHA validation
-            var recaptchaSecretKey = _configuration["GoogleReCaptcha:SecretKey"];
-            var recaptchaUrl = "https://www.google.com/recaptcha/api/siteverify";
-            var recaptchaResponse = RecaptchaResponse;
-
-            using (var client = new HttpClient())
-            {
-                var response = await client.PostAsync($"{recaptchaUrl}?secret={recaptchaSecretKey}&response={recaptchaResponse}", null);
-                var jsonString = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonSerializer.Deserialize<RecaptchaVerificationResponse>(jsonString);
-
-                if (jsonResponse == null || !jsonResponse.Success || jsonResponse.Score < 0.5)
-                {
-                    ModelState.AddModelError(string.Empty, "reCAPTCHA verification failed. Please try again.");
-                    return Page();
-                }
             }
 
             // Check for duplicate email
@@ -97,6 +62,7 @@ namespace AS_230474P.Pages.Membership
                 _logger.LogWarning("Password complexity validation failed for {Email}: {Feedback}", Registration.Email, passwordFeedback);
                 return Page();
             }
+
 
             // Save the Resume file only if provided (make it optional)
             string resumePath = null;
@@ -140,6 +106,8 @@ namespace AS_230474P.Pages.Membership
             // Redirect to a success page
             return RedirectToPage("Homepage", new { userId = newRegistration.Id });
         }
+
+
 
         private async Task<string> SaveResumeFileAsync(IFormFile resumeFile)
         {
@@ -236,6 +204,9 @@ namespace AS_230474P.Pages.Membership
             var encrypted = Convert.ToBase64String(ms.ToArray());
             return $"{iv}.{encrypted}";
         }
+
+
+
 
         private void LogValidationErrors()
         {

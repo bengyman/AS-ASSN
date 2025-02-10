@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using DotNetEnv;
 using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography; // Make sure to include this namespace for session handling.
+using System.Text.RegularExpressions;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System;
 
 namespace AS_230474P.Pages
 {
@@ -15,15 +18,13 @@ namespace AS_230474P.Pages
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<HomepageModel> _logger;
-        private readonly string _encryptionKey;
-        private const int MaxFailedAttempts = 3; // Lock account after 3 failures
-        private const int LockoutDurationMinutes = 5; // Lock duration before allowing retry
+        private const int MaxFailedAttempts = 3;
+        private const int LockoutDurationMinutes = 5;
 
-        public HomepageModel(ApplicationDbContext context, ILogger<HomepageModel> logger, string encryptionKey)
+        public HomepageModel(ApplicationDbContext context, ILogger<HomepageModel> logger)
         {
             _context = context;
             _logger = logger;
-            _encryptionKey = encryptionKey;
         }
 
         [BindProperty]
@@ -31,12 +32,7 @@ namespace AS_230474P.Pages
 
         public string ErrorMessage { get; set; }
 
-        public void OnGet()
-        {
-            // Render the login form
-        }
-
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
@@ -44,8 +40,22 @@ namespace AS_230474P.Pages
                 return Page();
             }
 
-            var user = _context.Registrations.FirstOrDefault(u => u.Email == Login.Email);
+            // Validate email format
+            if (!Regex.IsMatch(Login.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                ErrorMessage = "Invalid email format.";
+                return Page();
+            }
 
+            // Verify Google Recaptcha
+            string recaptchaToken = Request.Form["recaptchaToken"];
+            if (!await ValidateRecaptcha(recaptchaToken))
+            {
+                ErrorMessage = "Recaptcha verification failed.";
+                return Page();
+            }
+
+            var user = _context.Registrations.FirstOrDefault(u => u.Email == Login.Email);
             if (user == null)
             {
                 ErrorMessage = "Invalid email or password.";
@@ -53,18 +63,15 @@ namespace AS_230474P.Pages
                 return Page();
             }
 
-            // Check if the account is locked
             if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             {
                 ErrorMessage = $"Your account is locked. Try again at {user.LockoutEnd.Value.ToLocalTime():HH:mm:ss}.";
                 return Page();
             }
 
-            // Verify password
             if (!VerifyPassword(Login.Password, user.Password))
             {
                 user.FailedLoginAttempts += 1;
-
                 if (user.FailedLoginAttempts >= MaxFailedAttempts)
                 {
                     user.LockoutEnd = DateTime.UtcNow.AddMinutes(LockoutDurationMinutes);
@@ -80,32 +87,49 @@ namespace AS_230474P.Pages
                 return Page();
             }
 
-            // Reset failed attempts after successful login
             user.FailedLoginAttempts = 0;
             user.LockoutEnd = null;
             _context.SaveChanges();
 
             _logger.LogInformation("User {Email} logged in successfully.", Login.Email);
 
-            // Generate a unique session token
+            // Generate and store session token
             string sessionToken = GenerateSessionToken();
-
-            // Store session token in database
             user.SessionToken = sessionToken;
             _context.SaveChanges();
 
-            // Store session details in HTTP session
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("SessionToken", sessionToken);
 
-            // Redirect to the success page
             return RedirectToPage("/Membership/SuccessPage", new { userId = user.Id });
         }
 
+        private async Task<bool> ValidateRecaptcha(string token)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    var response = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify",
+                        new FormUrlEncodedContent(new[]
+                        {
+                            new KeyValuePair<string, string>("secret", "6Lf6otAqAAAAADPmXFOOKfhSyqFYstituVPyhiQd"),
+                            new KeyValuePair<string, string>("response", token)
+                        }));
 
-       
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    var recaptchaResult = JsonSerializer.Deserialize<RecaptchaResponse>(jsonResponse);
 
-    private bool VerifyPassword(string inputPassword, string storedHash)
+                    return recaptchaResult.success && recaptchaResult.score >= 0.5;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool VerifyPassword(string inputPassword, string storedHash)
         {
             var parts = storedHash.Split('.');
             if (parts.Length != 2) return false;
@@ -123,9 +147,14 @@ namespace AS_230474P.Pages
 
         private string GenerateSessionToken()
         {
-            // Generate a unique session token using a secure random number generator
-            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            return Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
         }
+    }
+
+    public class RecaptchaResponse
+    {
+        public bool success { get; set; }
+        public double score { get; set; }
     }
 
     public class LoginModel
