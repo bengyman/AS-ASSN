@@ -71,5 +71,12 @@ namespace AS_230474P.Models
 
         [Display(Name = "Lockout End Time")]
         public DateTime? LockoutEnd { get; set; } // Store lockout time
+
+        [Display(Name = "Password Reset Token")]
+        public string? PasswordResetToken { get; set; }
+
+        [Display(Name = "Reset Token Expiry")]
+        public DateTime? ResetTokenExpiry { get; set; }
+
     }
 }

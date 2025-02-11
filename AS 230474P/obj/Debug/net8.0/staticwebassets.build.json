@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "RTmER1WY7ZCDKduH8lz/V8+gLKZzNSh15900R77X0t8=",
+  "Hash": "n3ZWa23+D0KUv6ZrcPqZouw0OE+HIXedrt6nWzgxPf0=",
   "Source": "AS 230474P",
   "BasePath": "_content/AS 230474P",
   "Mode": "Default",
@@ -1212,6 +1212,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\uploads\\09e35b1a-b7d2-4ea3-a8fb-e0b0e04a478d.xlsx"
+    },
+    {
+      "Identity": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\0a83d120-f848-4174-967a-b581a40b2b78.xlsx",
+      "SourceId": "AS 230474P",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\",
+      "BasePath": "_content/AS 230474P",
+      "RelativePath": "uploads/0a83d120-f848-4174-967a-b581a40b2b78.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\0a83d120-f848-4174-967a-b581a40b2b78.xlsx"
     },
     {
       "Identity": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\47cbd6cd-7443-4781-99f6-15c701606bdf.docx",
