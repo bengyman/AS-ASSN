@@ -10,7 +10,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lf6otAqAAAAAHE2RmvT2TthTBtlmOFeot0aBgJk"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=@Model.SiteKey">
+        SiteKey = Environment.GetEnvironmentVariable("RECAPTCHA_SITE_KEY");
+    </script>
+    var siteKey = "@Model.SiteKey"
+
 </head>
 <body>
     <h1>Welcome! Please Log In</h1>
@@ -45,7 +49,7 @@
             event.preventDefault(); // Prevent default form submission
 
             grecaptcha.ready(function () {
-                grecaptcha.execute("6Lf6otAqAAAAAHE2RmvT2TthTBtlmOFeot0aBgJk", { action: "login" }).then(function (token) {
+                grecaptcha.execute("@Model.SiteKey", { action: "login" }).then(function (token) {
                     document.getElementById("recaptcha-token").value = token;
                     document.getElementById("login-form").submit(); // Submit after token is set
                 });

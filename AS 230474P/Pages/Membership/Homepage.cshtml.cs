@@ -23,20 +23,40 @@ namespace AS_230474P.Pages
         private const int LockoutDurationMinutes = 5;
         private readonly AuditLogService _auditLogService;
 
+        public string SiteKey { get; private set; }
+        public string SecretKey { get; private set; }
+
+
+
+
+
+
         public HomepageModel(ApplicationDbContext context, ILogger<HomepageModel> logger, AuditLogService auditLogService)
         {
             _context = context;
             _logger = logger;
             _auditLogService = auditLogService;
+            SiteKey = Environment.GetEnvironmentVariable("RECAPTCHA_SITE_KEY");
+            SecretKey = Environment.GetEnvironmentVariable("RECAPTCHA_SECRET_KEY");
         }
-
+        
         [BindProperty]
         public LoginModel Login { get; set; } = new LoginModel();
-
+      
         public string ErrorMessage { get; set; }
 
+
+
+
+
         public async Task<IActionResult> OnPostAsync()
+
         {
+            SiteKey = Environment.GetEnvironmentVariable("RECAPTCHA_SITE_KEY");
+            Console.WriteLine("Environment Variable RECAPTCHA_SITE_KEY: " + Environment.GetEnvironmentVariable("RECAPTCHA_SITE_KEY"));
+
+
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "Invalid input. Please try again.";
@@ -117,7 +137,7 @@ namespace AS_230474P.Pages
                     var response = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify",
                         new FormUrlEncodedContent(new[]
                         {
-                            new KeyValuePair<string, string>("secret", "6Lf6otAqAAAAADPmXFOOKfhSyqFYstituVPyhiQd"),
+                            new KeyValuePair<string, string>("secret", SecretKey),
                             new KeyValuePair<string, string>("response", token)
                         }));
 
