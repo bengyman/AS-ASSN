@@ -249,6 +249,10 @@
       "PackagePath": "staticwebassets\\uploads\\09e35b1a-b7d2-4ea3-a8fb-e0b0e04a478d.xlsx"
     },
     {
+      "Id": "C:\\Users\\koolp\\source\\repos\\AS 230474P\\AS 230474P\\wwwroot\\uploads\\844c617d-dafa-49b3-8b99-916faae4d678.xlsx",
+      "PackagePath": "staticwebassets\\uploads\\844c617d-dafa-49b3-8b99-916faae4d678.xlsx"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.AS 230474P.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

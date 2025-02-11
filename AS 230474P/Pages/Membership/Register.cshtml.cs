@@ -59,7 +59,7 @@ namespace AS_230474P.Pages.Membership
             if (!string.IsNullOrEmpty(passwordFeedback))
             {
                 ModelState.AddModelError("Registration.Password", passwordFeedback);
-                _logger.LogWarning("Password complexity validation failed for {Email}: {Feedback}", Registration.Email, passwordFeedback);
+                _logger.LogWarning("Password complexity validation failed for {Email}");
                 return Page();
             }
 
